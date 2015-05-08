@@ -1,0 +1,14 @@
+{
+  "name": "project-bin-config",
+  "version": "1.0.0",
+  "description": "project bin to manage configuration",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "maboiteaspam",
+  "license": "WTF",
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}
