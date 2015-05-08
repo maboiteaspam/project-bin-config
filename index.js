@@ -9,10 +9,12 @@ var MachineSelector = function(){
 MachineSelector.prototype.load = function(){
   this.servers = require('machines.json');
   this.profiles = require('profiles.json');
+  return this;
 };
 MachineSelector.prototype.write = function(){
   fs.writeFileSync('machines.json', JSON.stringify(this.servers));
   fs.writeFileSync('profiles.json', JSON.stringify(this.profiles));
+  return this;
 };
 
 MachineSelector.prototype.get = function(poolId){
