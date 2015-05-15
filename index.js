@@ -17,7 +17,7 @@ Config.prototype.load = function(){
   return this;
 };
 Config.prototype.write = function(){
-  fs.writeFileSync(process.cwd()+'/local.json', JSON.stringify(this.servers.local));
+  fs.writeFileSync(process.cwd()+'/.local.json', JSON.stringify(this.local.servers || {}));
   fs.writeFileSync(process.cwd()+'/machines.json', JSON.stringify(this.servers));
   fs.writeFileSync(process.cwd()+'/profiles.json', JSON.stringify(this.profiles));
   return this;
@@ -29,9 +29,9 @@ Config.prototype.get = function(poolId){
   var pool = [];
 
   if(poolId === "local"){
-    var local = _.clone(this.local.servers);
+    var local = _.clone(this.local.servers || {});
     local.machineId = "local";
-    local.profileData = this.local.profileData;
+    local.profileData = _.clone(this.local.profileData || {});
     pool.push(local);
   }else if( poolId in servers ){
     if( !servers[poolId].pool){
