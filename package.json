@@ -1,6 +1,6 @@
 {
   "name": "project-bin-config",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "API to manage per project configuration",
   "main": "index.js",
   "scripts": {
