@@ -17,9 +17,12 @@ Config.prototype.load = function(){
   return this;
 };
 Config.prototype.write = function(){
-  fs.writeFileSync(process.cwd()+'/.local.json', JSON.stringify(this.local.servers || {}));
-  fs.writeFileSync(process.cwd()+'/machines.json', JSON.stringify(this.servers));
-  fs.writeFileSync(process.cwd()+'/profiles.json', JSON.stringify(this.profiles));
+  if(Object.keys(this.local.servers).length || Object.keys(this.local.profileData).length)
+    fs.writeFileSync(process.cwd()+'/.local.json', JSON.stringify(this.local || {}));
+  if(Object.keys(this.profiles).length)
+    fs.writeFileSync(process.cwd()+'/profiles.json', JSON.stringify(this.profiles));
+  if(Object.keys(this.servers).length)
+    fs.writeFileSync(process.cwd()+'/machines.json', JSON.stringify(this.servers));
   return this;
 };
 
