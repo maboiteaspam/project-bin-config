@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>index.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>index.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+
+<span class="hljs-keyword">var</span> Config = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-keyword">this</span>.local = {};
+  <span class="hljs-keyword">this</span>.servers = {};
+  <span class="hljs-keyword">this</span>.profiles = {};
+};
+
+Config.prototype.load = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-keyword">if</span>(fs.existsSync(process.cwd()+<span class="hljs-string">'/machines.json'</span>))
+    <span class="hljs-keyword">this</span>.servers = <span class="hljs-built_in">require</span>(process.cwd()+<span class="hljs-string">'/machines.json'</span>);
+  <span class="hljs-keyword">if</span>(fs.existsSync(process.cwd()+<span class="hljs-string">'/profiles.json'</span>))
+    <span class="hljs-keyword">this</span>.profiles = <span class="hljs-built_in">require</span>(process.cwd()+<span class="hljs-string">'/profiles.json'</span>);
+  <span class="hljs-keyword">if</span>(fs.existsSync(process.cwd()+<span class="hljs-string">'/.local.json'</span>))
+    <span class="hljs-keyword">this</span>.local = <span class="hljs-built_in">require</span>(process.cwd()+<span class="hljs-string">'/.local.json'</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+};
+Config.prototype.write = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-keyword">if</span>(<span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.local.servers).length || <span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.local.profileData).length)
+    fs.writeFileSync(process.cwd()+<span class="hljs-string">'/.local.json'</span>, <span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>.local || {}));
+  <span class="hljs-keyword">if</span>(<span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.profiles).length)
+    fs.writeFileSync(process.cwd()+<span class="hljs-string">'/profiles.json'</span>, <span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>.profiles));
+  <span class="hljs-keyword">if</span>(<span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.servers).length)
+    fs.writeFileSync(process.cwd()+<span class="hljs-string">'/machines.json'</span>, <span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>.servers));
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+};
+
+Config.prototype.get = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(poolId)</span></span>{
+  <span class="hljs-keyword">var</span> servers = _.clone(<span class="hljs-keyword">this</span>.servers);
+  <span class="hljs-keyword">var</span> profiles = _.clone(<span class="hljs-keyword">this</span>.profiles);
+  <span class="hljs-keyword">var</span> pool = [];
+
+  <span class="hljs-keyword">if</span>(poolId === <span class="hljs-string">"local"</span>){
+    <span class="hljs-keyword">var</span> local = _.clone(<span class="hljs-keyword">this</span>.local.servers || {});
+    local.machineId = <span class="hljs-string">"local"</span>;
+    local.profileData = _.clone(<span class="hljs-keyword">this</span>.local.profileData || {});
+    pool.push(local);
+  }<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( poolId <span class="hljs-keyword">in</span> servers ){
+    <span class="hljs-keyword">if</span>( !servers[poolId].pool){
+      servers[poolId].pool = [poolId];
+    }
+    servers[poolId].pool.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(machineId)</span></span>{
+      pool.push( _.extend({machineId:machineId}, servers[poolId], servers[machineId]) );
+    });
+    pool.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(machineData)</span></span>{
+      <span class="hljs-keyword">if</span>( profiles[machineData.profile] ){
+        machineData.profileData = profiles[machineData.profile];
+      }<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (profiles[machineData.machineId] ){
+        machineData.profileData = profiles[machineData.machineId];
+      }<span class="hljs-keyword">else</span> {
+        machineData.profileData = {};
+      }
+    });
+  }
+  <span class="hljs-keyword">return</span> pool;
+};
+
+Config.prototype.setEnv = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(env, data)</span></span>{
+  <span class="hljs-keyword">if</span>(env===<span class="hljs-string">"local"</span>){
+    <span class="hljs-keyword">this</span>.local.servers = data;
+  }<span class="hljs-keyword">else</span>{
+    <span class="hljs-keyword">this</span>.servers[env] = data;
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+};
+
+Config.prototype.setProfile = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(profile, data)</span></span>{
+  <span class="hljs-keyword">if</span>(profile===<span class="hljs-string">"local"</span>){
+    <span class="hljs-keyword">this</span>.local.profileData = data;
+  }<span class="hljs-keyword">else</span>{
+    <span class="hljs-keyword">this</span>.profiles[profile] = data;
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+};
+
+<span class="hljs-built_in">module</span>.exports = Config;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
