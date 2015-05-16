@@ -1,7 +1,7 @@
 {
   "name": "project-bin-config",
   "version": "1.0.2",
-  "description": "project bin to manage configuration",
+  "description": "API to manage per project configuration",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
