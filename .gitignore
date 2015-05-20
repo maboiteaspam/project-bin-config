@@ -30,6 +30,6 @@ node_modules
 
 .local.json
 
-.local
-
 .idea/
+
+test/fixtures/

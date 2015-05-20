@@ -4,7 +4,7 @@
   "description": "API to manage per project configuration",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "bin": {
     "project-doc": "bin.js"
@@ -15,6 +15,12 @@
   "author": "maboiteaspam",
   "license": "WTF",
   "dependencies": {
+    "node.extend": "^1.1.3",
+    "path-extra": "^1.0.2",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "fs-extra": "^0.18.3",
+    "should": "^6.0.3"
   }
 }
